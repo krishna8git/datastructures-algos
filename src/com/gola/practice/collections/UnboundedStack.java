@@ -4,36 +4,31 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
-/**
- * Not thread-safe. 
- * @author Krishna
- */
-public class BoundedStack<E> implements Stack<E> {
+public class UnboundedStack<E> implements Stack<E> {
 
-    private int              top;
+    @SuppressWarnings("hiding")
+    private class Node<E> {
+        E       ele;
+        Node<E> next;
 
-    private E[]              stackData;
-
-    private static final int DEFAULT_CAPACITY = 10;
-
-    public BoundedStack() {
-        this(DEFAULT_CAPACITY);
+        public Node(E ele) {
+            this.ele = ele;
+            this.next = null;
+        }
     }
 
-    @SuppressWarnings("unchecked")
-    public BoundedStack(int capacity) {
-        top = -1;
-        stackData = (E[]) new Object[capacity];
-    }
+    private Node<E> top = null;
+
+    private int     size;
 
     @Override
     public int size() {
-        return top + 1;
+        return size;
     }
 
     @Override
     public boolean isEmpty() {
-        return top < 0;
+        return size <= 0;
     }
 
     @Override
@@ -43,82 +38,69 @@ public class BoundedStack<E> implements Stack<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return new StackIterator<E>(top);
+        return new LinkedStackIterator<>(top);
     }
 
     @Override
     public boolean push(E e) {
-        checkForNull(e);
-;
-        if (top >= stackData.length) {
-            throw new RuntimeException("Stack Overflow");
-        }
-
-        stackData[++top] = e;
-        // System.out.println("Element Pushed(" + top + "): " + e);
+        Node<E> newTop = new Node<E>(e);
+        newTop.next = top;
+        top = newTop;
+        ++size;
         return true;
-    }
-
-    private void checkForNull(Object obj) {
-        if (obj == null) {
-            throw new NullPointerException("null not allwed in this Stack");
-        }
     }
 
     @Override
     public E pop() {
-        if (isEmpty()) {
-            throw new NoSuchElementException("Stack Underflow");
-        }
-
-        E ele = stackData[top--];
-
-        return ele;
+        Node<E> temp = top;
+        top = top.next;
+        --size;
+        return temp.ele;
     }
 
     @Override
     public void clear() {
-        top = -1;
+        top = null; // Let the GC take care of garbage
+        size = 0;
     }
 
     @SuppressWarnings("hiding")
-    private class StackIterator<E> implements Iterator<E> {
+    private class LinkedStackIterator<E> implements Iterator<E> {
+        private Node<E> _top;
 
-        private int cursor;
-
-        public StackIterator(int top) {
-            cursor = top;
+        public LinkedStackIterator(Node<E> top) {
+            this._top = top;
         }
 
         @Override
         public boolean hasNext() {
-            return cursor >= 0;
+            return _top != null;
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         public E next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-
-            return (E) stackData[cursor--];
+            E ele = _top.ele;
+            _top = _top.next;
+            return ele;
         }
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[ ");
-        for (E e : this) {
-            sb.append(e).append(" ");
-        }
-        sb.append("]");
-        return sb.toString();
+	StringBuilder sb = new StringBuilder();
+	sb.append("[ ");
+	for (E e : this) {
+	    sb.append(e).append(" ");
+	}
+	sb.append("]");
+	return sb.toString();
     }
 
     public static void main(String[] args) {
-        Stack<Integer> intStack = new BoundedStack<>(15);
+        Stack<Integer> intStack = new UnboundedStack<>();
         Random random = new Random();
 
         for (int i = 0; i < 15; i++) {
@@ -152,5 +134,6 @@ public class BoundedStack<E> implements Stack<E> {
         System.out.println("Stack Size: " + intStack.size());
         System.out.println(intStack);
 
+        intStack.push(100); // Should give RuntimeException because of Stack Overflow
     }
 }
