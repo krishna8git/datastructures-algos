@@ -26,6 +26,13 @@ public class UnboundedStack<E> implements Stack<E> {
         return size;
     }
 
+    @SafeVarargs
+    public UnboundedStack ( E... elements ) {
+        for (E element : elements) {
+            push(element);
+        }
+    }
+
     @Override
     public boolean isEmpty() {
         return size <= 0;

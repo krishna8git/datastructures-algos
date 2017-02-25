@@ -38,7 +38,12 @@ public class BoundedStack<E> implements Stack<E> {
 
     @Override
     public boolean contains(Object o) {
-        throw new UnsupportedOperationException();
+        for (int temp = top ; temp >= 0 ; temp -- ) {
+            if (stackData[temp].equals(o)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -49,7 +54,6 @@ public class BoundedStack<E> implements Stack<E> {
     @Override
     public boolean push(E e) {
         checkForNull(e);
-;
         if (top >= stackData.length) {
             throw new RuntimeException("Stack Overflow");
         }
