@@ -53,9 +53,7 @@ public class BoundedStack<E> implements Stack<E> {
         if (top >= stackData.length) {
             throw new RuntimeException("Stack Overflow");
         }
-
         stackData[++top] = e;
-        // System.out.println("Element Pushed(" + top + "): " + e);
         return true;
     }
 
