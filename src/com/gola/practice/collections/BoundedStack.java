@@ -4,6 +4,10 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
+/**
+ * Not thread-safe. 
+ * @author Krishna
+ */
 public class BoundedStack<E> implements Stack<E> {
 
     private int              top;
@@ -34,7 +38,11 @@ public class BoundedStack<E> implements Stack<E> {
 
     @Override
     public boolean contains(Object o) {
-        // TODO Auto-generated method stub
+        for (int temp = top ; temp >= 0 ; temp -- ) {
+            if (stackData[temp].equals(o)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -46,13 +54,10 @@ public class BoundedStack<E> implements Stack<E> {
     @Override
     public boolean push(E e) {
         checkForNull(e);
-
-        if (top >= stackData.length-1) {
+        if (top >= stackData.length) {
             throw new RuntimeException("Stack Overflow");
         }
-
         stackData[++top] = e;
-
         return true;
     }
 
@@ -149,6 +154,5 @@ public class BoundedStack<E> implements Stack<E> {
         System.out.println("Stack Size: " + intStack.size());
         System.out.println(intStack);
 
-        intStack.push(100); //Should give RuntimeException because of Stack Overflow
     }
 }
