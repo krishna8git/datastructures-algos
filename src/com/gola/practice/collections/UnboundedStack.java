@@ -2,7 +2,6 @@ package com.gola.practice.collections;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 public class UnboundedStack<E> implements Stack<E> {
 
